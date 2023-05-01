@@ -18,9 +18,22 @@ def entry_maker(lines):
             if entry:
                 entries.append(entry)
             
-            # Separate the string by spaces, isolate the first element
+            # Separate the string by spaces, isolate the date
             new_line = line.split(" ", 1)
             date = new_line[0]
+
+            # Process the date string so that it fits the format YYYY/MM/DD
+            split_date = date.split("/")
+            year = split_date[0]
+            month = split_date[1]
+            day = split_date[2]
+
+            if len(month) < 2:
+                month = "0" + month 
+            if len(day) < 2:
+                day = "0" + day 
+
+            date = year + "/" + month + "/" + day
 
             # Everything remaining is the description
             desc = new_line[1]

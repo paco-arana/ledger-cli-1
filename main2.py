@@ -23,7 +23,10 @@ with open("index.ledger", "r") as ind:
 d_frame = pd.DataFrame(all_entries)
 d_frame = d_frame.explode(["account", "credit"])
 
+# Pandas filters:
+d_frame = d_frame.sort_values(by=["date"], ascending=False) # This sorts by date, most recent first
+
 # Use tabulate to display
-my_table = tabulate(d_frame, headers="keys", tablefmt="grid", showindex="False")
+my_table = tabulate(d_frame, headers="keys", tablefmt="grid")
 
 print(my_table)
