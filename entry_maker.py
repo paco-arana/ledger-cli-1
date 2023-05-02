@@ -1,5 +1,4 @@
-def entry_maker(lines):
-
+def entry_maker(lines, prices="prices_db"):
     # create an empty list to store every entry 
     entries = []
     entry = {}
@@ -39,9 +38,14 @@ def entry_maker(lines):
             desc = new_line[1]
             desc = desc.replace("\n", "")
 
+            # Reset counter and all lists
             c = 1
             acct = []
-            cred = []
+            movt = []
+            movt_value = []
+            movt_units = []
+            bal_value = []
+            bal_units = []
 
             while i+c < len(lines):
                 if lines[i+c].startswith("20") or lines[i+c].startswith("19"):
@@ -64,21 +68,42 @@ def entry_maker(lines):
 
                     # The element at index 1 is the credit:
                     try:
-                        cred.append(new_line[1])
+                        movt.append(new_line[1])
                     # If there is no value there that means we should take the value above
                     except IndexError:
-                        credit_previous = flip_symbols(cred[-1])
+                        movement_previous = flip_symbols(movt[-1])
 
-                        cred.append(credit_previous)
-                    
+                        movt.append(movement_previous)
+
                 c += 1
+
+            # Separate movement values and units
+            for val in movt:
+                val_list = val.split()
+                if len(val_list) > 1:
+                    movt_value.append(float(val_list[0]))
+                    movt_units.append(val_list[1])
+                else:
+                    val = val_list[0]
+                    val = val.replace("$", "")
+                    movt_value.append(float(val))
+                    movt_units.append("$")
+
+            # Build balance column
+            bal_columns = build_bal(movt_value, movt_units, prices)
+
+            bal_value = bal_columns[0]
+            bal_units = bal_columns[1]
 
             # Add data to entry
             entry = {
                 "date": date,
                 "description": desc,
                 "account": acct,
-                "credit": cred,
+                "mov": movt_value,
+                "u": movt_units,
+                "bal": bal_value,
+                "u'": bal_units,
             }
 
     # Append the final entry
@@ -88,6 +113,39 @@ def entry_maker(lines):
     # print the list of entries
     return(entries)
 
+
+# This function builds the balance column
+def build_bal(l_value, l_units, prices):
+    # Imports the exchange rates specified for use later
+    with open(prices, "r") as f:
+        ex_rates = f.readlines()
+
+    # Movement column:
+    top_movt_val = l_value[0]
+    bot_movt_val = l_value[1]
+    top_movt_u = l_units[0]
+    bot_movt_u = l_units[1]
+
+    # If units match we don't convert
+    if top_movt_u == bot_movt_u:
+        top_bal_val = top_movt_val
+        top_bal_u = top_movt_u
+        bot_bal_val = bot_movt_val + top_bal_val
+        bot_bal_u = bot_movt_u
+        return[[float(top_bal_val), float(bot_bal_val)], 
+               [top_bal_u, bot_bal_u]]
+    else:
+        for ex in ex_rates[2:]:
+            if top_movt_u in ex:
+                rate_split = ex.split("$")
+                rate = float(rate_split[1])
+                top_bal_val = top_movt_val * rate
+                
+                bot_bal_val = top_bal_val + bot_movt_val
+
+                print(rate)
+
+        return[[float(top_bal_val), float(bot_bal_val)], ["$", "$"]]
 
 # This is just to change from positive to negative values
 def flip_symbols(string):

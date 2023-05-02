@@ -14,19 +14,19 @@ with open("index.ledger", "r") as ind:
 
         with open(location, "r") as fil:
             lines = fil.readlines()
-            entries = entry_maker(lines)
+            entries = entry_maker(lines, "prices_db")
         
         for entry in entries:
             all_entries.append(entry)
         
 # Convert data from json to dataframe
 d_frame = pd.DataFrame(all_entries)
-d_frame = d_frame.explode(["account", "credit"])
+d_frame = d_frame.explode(["account", "mov", "u", "bal", "u'"])
 
 # Pandas filters:
 d_frame = d_frame.sort_values(by=["date"], ascending=False) # This sorts by date, most recent first
 
 # Use tabulate to display
-my_table = tabulate(d_frame, headers="keys", tablefmt="grid")
+my_table = tabulate(d_frame, headers="keys", tablefmt="github", floatfmt=".2f")
 
 print(my_table)
