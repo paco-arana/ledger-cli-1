@@ -1,54 +1,26 @@
-from prettytable import PrettyTable
-from prettytable import MSWORD_FRIENDLY
+import argparse
+from brain import table_maker
+from tabulate import tabulate
 
-my_table = PrettyTable()
-my_table.field_names = ["Date", "Description", "Account", "Credit"]
-my_table.align = "l"
-my_table.align["Credit"] = "c"
-my_table.set_style(MSWORD_FRIENDLY)
- 
-file1 = open("Bitcoin.ledger", "r")
-lines = file1.readlines()
+parser = argparse.ArgumentParser(description="Ledger")
 
-count = 1
-hidden = 0
-date = ""
-desc = ""
+parser.add_argument("register", action="store_true")
 
-def add_a_row(text_line):
-    # Separate account from credit using the tabs (\t)
-    new_line = text_line.split("\t")
-    # Remove any empty strings from the line 
-    new_line = list(filter(None, new_line))
-    # Remove any breaks (\n) from the strings
-    for i in range(len(new_line)):
-        new_line[i] = new_line[i].replace('\n', '')
-    # The element at index 0 is the account:    
-    acc = new_line[0]
-    # The element at index 1 is the credit:
-    credit = new_line[1]
+args = parser.parse_args()
 
-    my_table.add_row([date, desc, acc, credit])
+if args.register == True:
+    display = table_maker()
+    tabular_data = display[0]
+    balance_total = display[1]
+    balance_total = "%.2f" % balance_total
 
-for line in lines[1:]:
 
-    if line.startswith("\t"):
-        add_a_row(line)
+
+
+    if len(display) > 1:
+        print(display[0])
+        print("------------------------")
+        print(f"Balance: {balance_total}")
 
     else:
-        # Separate the string by spaces, isolate the first element
-        new_line = line.split(" ", 1)
-        # First element of the resulting list is the date 
-        date = new_line[0]
-
-        # Everything remaining is the description
-        desc = new_line[1]
-        desc = desc.replace("\n", "")
-
-
-
-print(my_table)
-
-
-
-
+        print(display[0])

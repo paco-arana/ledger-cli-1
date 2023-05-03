@@ -1,4 +1,8 @@
 def entry_maker(lines, prices="prices_db"):
+    # Imports the exchange rates specified for use later
+    with open(prices, "r") as f:
+        ex_rates = f.readlines()
+
     # create an empty list to store every entry 
     entries = []
     entry = {}
@@ -44,8 +48,6 @@ def entry_maker(lines, prices="prices_db"):
             movt = []
             movt_value = []
             movt_units = []
-            bal_value = []
-            bal_units = []
 
             while i+c < len(lines):
                 if lines[i+c].startswith("20") or lines[i+c].startswith("19"):
@@ -80,20 +82,32 @@ def entry_maker(lines, prices="prices_db"):
             # Separate movement values and units
             for val in movt:
                 val_list = val.split()
-                if len(val_list) > 1:
-                    movt_value.append(float(val_list[0]))
-                    movt_units.append(val_list[1])
+                if len(val_list) > 1: # For units other than "$"
+                    curr = val_list[1]
+                    for ex in ex_rates[2:]:
+                        if curr in ex:
+                            rate_split = ex.split("$")
+                            rate = float(rate_split[1])
+
+                    prev_val = float(val_list[0])
+                    new_val = prev_val * rate
+
+                    movt_value.append(new_val)
+                    movt_units.append("$")
                 else:
                     val = val_list[0]
                     val = val.replace("$", "")
                     movt_value.append(float(val))
                     movt_units.append("$")
 
-            # Build balance column
-            bal_columns = build_bal(movt_value, movt_units, prices)
+            
 
+            # Build balance column (Obsolete)
+            """
+            bal_columns = build_bal(movt_value, movt_units, prices)
             bal_value = bal_columns[0]
             bal_units = bal_columns[1]
+            """
 
             # Add data to entry
             entry = {
@@ -102,8 +116,8 @@ def entry_maker(lines, prices="prices_db"):
                 "account": acct,
                 "mov": movt_value,
                 "u": movt_units,
-                "bal": bal_value,
-                "u'": bal_units,
+                # "bal": bal_value,
+                # "u'": bal_units,
             }
 
     # Append the final entry
