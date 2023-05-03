@@ -4,11 +4,11 @@ from tabulate import tabulate
 
 parser = argparse.ArgumentParser(description="Ledger")
 
-parser.add_argument("register", action="store_true")
+parser.add_argument("register", action="store_true", default=False)
 
 args = parser.parse_args()
 
-if args.register == True:
+if args.register:
     display = table_maker()
     tabular_data = display[0]
     balance_total = display[1]
