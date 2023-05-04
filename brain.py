@@ -1,4 +1,5 @@
 from entry_maker import entry_maker
+import argparse
 from tabulate import tabulate
 import pandas as pd
 
@@ -22,18 +23,51 @@ def table_maker():
             
     # Convert data from json to dataframe
     d_frame = pd.DataFrame(all_entries)
-    d_frame = d_frame.explode(["account", "mov", "u"])
+    return d_frame.explode(["account", "mov", "u"])
 
     # Pandas filters examples:
     # d_frame = d_frame.sort_values(by=["date"], ascending=False) # This sorts by date, most recent first
 
-    # calculate the running balance column using "cumulative sum" cumsum()
-    d_frame['bal'] = d_frame['mov'].cumsum()
+def ledger_register(args):
+    df = table_maker()
 
-    # add a total row for the running balance column
-    total = d_frame['bal'].iloc[-1]
+    # if an account or list of accounts is given they have to be used to filter the table
+    if args.account:
+        accounts = args.account
+        
+        accounts = accounts.split()
+        print(accounts)
+        df2 = df.query("account like @accounts")
+    else:
+        df2 = df
+
+    df2['bal'] = df2['mov'].cumsum()
+
+    # Use tabulate to format dataframe into a table
+    my_table = tabulate(df2, headers="keys", floatfmt=".2f")
+
+    return(my_table)
+
+def ledger_balance(args):
+    df = table_maker()
+    df['bal'] = df['mov'].cumsum()
+
+    # return the last item in the 'bal' column as a total 
+    total = df['bal'].iloc[-1]
+
+    for_table = {
+        "Balance": [total],
+    }
+
+    my_table = tabulate(for_table, headers="keys", floatfmt=".2f")
+
+    return(my_table)
+
+def ledger_print():
+    df = table_maker()
+    df['bal'] = df['mov'].cumsum()
     
-    # Use tabulate to display both dataframes together
-    my_table = tabulate(d_frame, headers="keys", floatfmt=".2f")
+    # Use tabulate to format dataframe into a table
+    my_table = tabulate(df, headers="keys", floatfmt=".2f")
 
-    return([my_table, total])
+    return(my_table)
