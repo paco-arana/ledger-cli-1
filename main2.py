@@ -24,6 +24,6 @@ if args.command == "register":
 elif args.command == "balance":
     print(ledger_balance(args))
 elif args.command == "print":
-    ledger_print(args)
+    ledger_print()
 
 

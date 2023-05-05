@@ -1,4 +1,5 @@
 from entry_maker import entry_maker
+from print_maker import print_maker
 import argparse
 from tabulate import tabulate
 import pandas as pd
@@ -64,10 +65,29 @@ def ledger_balance(args):
     return(my_table)
 
 def ledger_print():
-    df = table_maker()
-    df['bal'] = df['mov'].cumsum()
-    
-    # Use tabulate to format dataframe into a table
-    my_table = tabulate(df, headers="keys", floatfmt=".2f")
+    all_entries = []
 
-    return(my_table)
+    with open("index.ledger", "r") as ind:
+        index_lines = ind.readlines()
+
+        for index_line in index_lines:
+            file = index_line.split()
+            location = file[1]
+
+
+            with open(location, "r") as fil:
+                lines = fil.readlines()
+                entries = entry_maker(lines, "prices_db")
+            
+            for entry in entries:
+                all_entries.append(entry)
+                date = entry["date"]
+                description = entry["description"]
+                accounts = entry["account"]
+                movements = entry["mov"]
+                units = entry["u"]
+
+                print(f"{date} {description}")
+                print(f"    {accounts[0]}   {movements[0]}{units[0]}")
+                print(f"    {accounts[1]}   {movements[1]}{units[1]}")
+        
