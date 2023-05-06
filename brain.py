@@ -88,6 +88,16 @@ def ledger_print():
                 units = entry["u"]
 
                 print(f"{date} {description}")
-                print(f"    {accounts[0]}   {movements[0]}{units[0]}")
-                print(f"    {accounts[1]}   {movements[1]}{units[1]}")
+                print(f"    {accounts[0]}   {format_currency(movements[0], units[0])}")
+                print(f"    {accounts[1]}   {format_currency(movements[1], units[1])}")
         
+def format_currency(amount, unit):
+    # Format the amount to two decimal places
+    amount_str = f"{amount:.2f}"
+    
+    # If the amount is negative, insert the dollar sign after the minus symbol
+    if amount < 0:
+        return f"-{unit}{amount_str[1:]}"
+    # Otherwise, insert the dollar sign before the number
+    else:
+        return f"{unit}{amount_str}"
