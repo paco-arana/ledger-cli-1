@@ -13,17 +13,23 @@ parser.add_argument("command", type=str, choices=["register", "balance", "print"
 parser.add_argument("-a", "--account", type=str, metavar="STRING",
                     help="Narrow search to selected accounts")
 
-parser.add_argument("-s", "--sort", type=str, metavar="STRING" )
+parser.add_argument("-s", "--sort", type=str, choices=["date", "description"])
 
+parser.add_argument("-p", "--price-db", type=str, metavar="FILE")
+
+parser.add_argument("-f", "--file", type=str, metavar="FILE")
 
 args = parser.parse_args()
 
-
+# Depending on what command was called, execute a different function from 'brain.py'
 if args.command == "register":
     print(ledger_register(args))
 elif args.command == "balance":
-    print(ledger_balance(args))
+    balance = ledger_balance(args)
+    if args.account:
+        print(balance[0])
+        print(balance[1])
+    else:
+        print(balance[1])
 elif args.command == "print":
-    ledger_print()
-
-
+    ledger_print(args)

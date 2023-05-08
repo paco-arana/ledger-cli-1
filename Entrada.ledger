@@ -1,0 +1,7 @@
+; Entrada
+2013/11/21 (TEST)Payment for hard work completed
+	Bank:Paypal		$700.00
+	Income:Hard Work
+2013/7/1 (TEST)Partial payment from Client X
+	Bank:Paypal		$200
+	Receivable:ClientX

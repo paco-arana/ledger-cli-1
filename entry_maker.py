@@ -1,3 +1,6 @@
+# This file is used to read the ledger files and build a dictionary with the data
+# This dictionary is passed to the 'brain.py' file where it is converted to a pandas dataframe
+
 def entry_maker(lines, prices="prices_db"):
     # Imports the exchange rates specified for use later
     with open(prices, "r") as f:
