@@ -1,11 +1,10 @@
-# This file is used to read the ledger files and build a dictionary with the data
+# This file takes the lines of each ledger file and builds a dictionary with the data
 # This dictionary is passed to the 'brain.py' file where it is converted to a pandas dataframe
 
-def entry_maker(lines, prices="prices_db"):
-    # Imports the exchange rates specified for use later
-    with open(prices, "r") as f:
-        ex_rates = f.readlines()
+running_balance_value = [0]
+currencies_used = ["$"]
 
+def entry_maker(lines):
     # create an empty list to store every entry 
     entries = []
     entry = {}
@@ -58,7 +57,7 @@ def entry_maker(lines, prices="prices_db"):
                 else:
                     text_line = lines[i+c]
                     
-                    # Separate account from credit using the tabs (\t)
+                    # Separate account from money using the tabs (\t)
                     new_line = text_line.split("\t")
 
                     # Remove any empty strings from the line 
@@ -86,31 +85,20 @@ def entry_maker(lines, prices="prices_db"):
             for val in movt:
                 val_list = val.split()
                 if len(val_list) > 1: # For units other than "$"
+                    val = val_list[0]
                     curr = val_list[1]
-                    for ex in ex_rates[2:]:
-                        if curr in ex:
-                            rate_split = ex.split("$")
-                            rate = float(rate_split[1])
-
-                    prev_val = float(val_list[0])
-                    new_val = prev_val * rate
-
-                    movt_value.append(new_val)
-                    movt_units.append("$")
+                    movt_value.append(val)
+                    movt_units.append(curr)
                 else:
                     val = val_list[0]
                     val = val.replace("$", "")
                     movt_value.append(float(val))
                     movt_units.append("$")
 
-            
-
-            # Build balance column (Obsolete)
-            """
-            bal_columns = build_bal(movt_value, movt_units, prices)
-            bal_value = bal_columns[0]
-            bal_units = bal_columns[1]
-            """
+            # Previously used to build the balance column (Obsolete)
+            # bal_columns = build_bal(movt_value, movt_units)
+            # bal_value = bal_columns[0]
+            # bal_units = bal_columns[1]
 
             # Add data to entry
             entry = {
@@ -120,7 +108,7 @@ def entry_maker(lines, prices="prices_db"):
                 "mov": movt_value,
                 "u": movt_units,
                 # "bal": bal_value,
-                # "u'": bal_units,
+                # "u'": bal_units
             }
 
     # Append the final entry
@@ -131,42 +119,10 @@ def entry_maker(lines, prices="prices_db"):
     return(entries)
 
 
-# This function builds the balance column
-def build_bal(l_value, l_units, prices):
-    # Imports the exchange rates specified for use later
-    with open(prices, "r") as f:
-        ex_rates = f.readlines()
-
-    # Movement column:
-    top_movt_val = l_value[0]
-    bot_movt_val = l_value[1]
-    top_movt_u = l_units[0]
-    bot_movt_u = l_units[1]
-
-    # If units match we don't convert
-    if top_movt_u == bot_movt_u:
-        top_bal_val = top_movt_val
-        top_bal_u = top_movt_u
-        bot_bal_val = bot_movt_val + top_bal_val
-        bot_bal_u = bot_movt_u
-        return[[float(top_bal_val), float(bot_bal_val)], 
-               [top_bal_u, bot_bal_u]]
-    else:
-        for ex in ex_rates[2:]:
-            if top_movt_u in ex:
-                rate_split = ex.split("$")
-                rate = float(rate_split[1])
-                top_bal_val = top_movt_val * rate
-                
-                bot_bal_val = top_bal_val + bot_movt_val
-
-                print(rate)
-
-        return[[float(top_bal_val), float(bot_bal_val)], ["$", "$"]]
-
 # This is just to change from positive to negative values
 def flip_symbols(string):
     if string.startswith("-"):
         return string[1:]
     else:
         return "-" + string
+    
