@@ -1,5 +1,6 @@
 import argparse
 from brain import ledger_balance, ledger_print, ledger_register
+from register_alt import ledger_register_alt
 
 parser = argparse.ArgumentParser(
     prog='Ledger CLI',
@@ -13,7 +14,7 @@ parser.add_argument("command", type=str, choices=["register", "balance", "print"
 parser.add_argument("-a", "--account", type=str, metavar="STRING",
                     help="Narrow search to selected accounts")
 
-parser.add_argument("-s", "--sort", type=str, choices=["date", "d", "description"])
+parser.add_argument("-s", "--sort", type=str, choices=["date", "d"])
 
 parser.add_argument("-p", "--price-db", type=str, metavar="FILE")
 
@@ -23,7 +24,10 @@ args = parser.parse_args()
 
 # Depending on what command was called, execute a different function from 'brain.py'
 if args.command == "register":
-    print(ledger_register(args))
+    if args.price_db:
+        print(ledger_register_alt(args))
+    else:
+        print(ledger_register(args))
 elif args.command == "balance":
     balance = ledger_balance(args)
     if args.account:

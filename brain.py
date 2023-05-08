@@ -95,6 +95,9 @@ def ledger_balance(args):
     df1 = df1[["mov", "u", "account"]]
     df2 = df2[["bal", "u'"]]
 
+    if args.price_db:
+        df2 = ex_rate(df2, args)
+
     main_table = tabulate(df1, headers="keys", floatfmt=".2f", showindex=False)
     total_table = tabulate(df2, floatfmt=".2f", showindex=False)
 
@@ -154,3 +157,31 @@ def format_currency(amount, unit):
         # Otherwise, insert the dollar sign before the number
         else:
             return f"{unit}{amount_str}"
+
+def ex_rate(d_frame, args):
+    all_values = []
+    with open(f"ledger_files\{args.price_db}", "r") as f:
+        ex_rates = f.readlines()
+
+    for i, row in d_frame.iterrows():
+        value = row['bal']
+        unit = row["u'"]
+
+        # Search the unit in the args.price_db
+        if unit != "$":
+            for ex in ex_rates[2:]:
+                if unit in ex:
+                    rate_split = ex.split("$")
+                    rate = float(rate_split[1])
+                    new_value = value * rate
+
+                    # Append it to a list to be summed later
+                    all_values.append(new_value)
+        
+    total_val = sum(all_values)
+    new_df = {
+        "bal": [total_val],
+        "u'": ["$"],
+    }
+
+    return(pd.DataFrame(new_df))
