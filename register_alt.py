@@ -13,7 +13,7 @@ def table_maker(args):
     else:  
         file_index = "index.ledger"
 
-    with open(f"ledger_files\{file_index}", "r") as ind:
+    with open(file_index, "r") as ind:
         index_lines = ind.readlines()
 
         for index_line in index_lines:
@@ -21,9 +21,9 @@ def table_maker(args):
             location = file[1]
 
 
-            with open(f"ledger_files\{location}", "r") as fil:
+            with open(location, "r") as fil:
                 lines = fil.readlines()
-                entries = entry_maker(lines, "prices_db")
+                entries = entry_maker(lines, args.price_db)
 
             for entry in entries:
                 all_entries.append(entry)
@@ -59,7 +59,7 @@ def table_maker(args):
 
 def entry_maker(lines, prices="prices_db"):
     # Imports the exchange rates specified for use later
-    with open(f"ledger_files\{prices}", "r") as f:
+    with open(prices, "r") as f:
         ex_rates = f.readlines()
 
     # create an empty list to store every entry 

@@ -19,14 +19,14 @@ def table_maker(args):
     else:  
         file_index = "index.ledger"
 
-    with open(f"ledger_files\{file_index}", "r") as ind:
+    with open(file_index, "r") as ind:
         index_lines = ind.readlines()
 
         for index_line in index_lines:
             file = index_line.split()
             location = file[1]
 
-            with open(f"ledger_files\{location}", "r") as fil:
+            with open(location, "r") as fil:
                 lines = fil.readlines()
                 # If a different file was specified using --price-db use that for exchange rates
                 entries = entry_maker(lines)
@@ -112,7 +112,7 @@ def ledger_print(args):
     else:  
         file_index = "index.ledger"
 
-    with open(f"ledger_files\{file_index}", "r") as ind:
+    with open(file_index, "r") as ind:
         index_lines = ind.readlines()
 
         for index_line in index_lines:
@@ -120,7 +120,7 @@ def ledger_print(args):
             location = file[1]
 
 
-            with open(f"ledger_files\{location}", "r") as fil:
+            with open(location, "r") as fil:
                 lines = fil.readlines()
                 entries = entry_maker(lines)
             
@@ -160,7 +160,7 @@ def format_currency(amount, unit):
 
 def ex_rate(d_frame, args):
     all_values = []
-    with open(f"ledger_files\{args.price_db}", "r") as f:
+    with open(args.price_db, "r") as f:
         ex_rates = f.readlines()
 
     for i, row in d_frame.iterrows():
