@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(
     epilog='Made by Jose Arana for the Encora apprenticeship program'
 )
 
-parser.add_argument("command", type=str, choices=["register", "reg", "r", "balance", "bal", "b", "print", "pr"],
+parser.add_argument("command", type=str, choices=["register", "reg", "r", "balance", "bal", "b", "print", "p"],
                     help="Use 'register' to show every transaction and a running balance. Use 'balance' to show balance only. Use 'print' to show input files formatted uniformly.")
 
 parser.add_argument("-a", "--account", type=str, metavar="STRING",
@@ -17,7 +17,7 @@ parser.add_argument("-a", "--account", type=str, metavar="STRING",
 parser.add_argument("-s", "--sort", type=str, choices=["date", "d"],
                     help="Used to sort the results, only sorting options currently available are date-related")
 
-parser.add_argument("-p", "--price-db", type=str, metavar="FILE",
+parser.add_argument("-pdb", "--price-db", type=str, metavar="FILE",
                     help="Requires a file to be specified, when used the results will be shown in USD according to the exchange rate")
 
 parser.add_argument("-f", "--file", type=str, metavar="FILE",

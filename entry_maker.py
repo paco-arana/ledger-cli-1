@@ -95,11 +95,6 @@ def entry_maker(lines):
                     movt_value.append(float(val))
                     movt_units.append("$")
 
-            # Previously used to build the balance column (Obsolete)
-            # bal_columns = build_bal(movt_value, movt_units)
-            # bal_value = bal_columns[0]
-            # bal_units = bal_columns[1]
-
             # Add data to entry
             entry = {
                 "date": date,
